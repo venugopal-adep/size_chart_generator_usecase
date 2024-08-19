@@ -194,10 +194,43 @@ with tab4:
     st.write(cluster_distribution)
 
     st.subheader('Cluster Visualization')
-    fig = px.scatter(clustered_data, x='Height (cm)', y='Weight (kg)', color='Cluster',
-                     hover_data=['Chest (cm)', 'Waist (cm)', 'Hip (cm)'],
-                     title=f"Clusters of Users Based on Body Measurements ({clustering_algorithm})")
-    st.plotly_chart(fig)
+    
+    # Multi-select option for visualization fields
+    visualization_fields = st.multiselect(
+        "Select fields for visualization (2 or 3)",
+        ['Height (cm)', 'Weight (kg)', 'Chest (cm)', 'Waist (cm)', 'Hip (cm)'],
+        default=['Height (cm)', 'Weight (kg)']
+    )
+
+    if len(visualization_fields) not in [2, 3]:
+        st.warning("Please select either 2 or 3 fields for visualization.")
+    else:
+        # Custom color scale
+        color_scale = px.colors.qualitative.Prism
+
+        if len(visualization_fields) == 2:
+            fig = px.scatter(
+                clustered_data, 
+                x=visualization_fields[0], 
+                y=visualization_fields[1], 
+                color='Cluster',
+                color_discrete_sequence=color_scale,
+                hover_data=['Height (cm)', 'Weight (kg)', 'Chest (cm)', 'Waist (cm)', 'Hip (cm)'],
+                title=f"2D Cluster Visualization ({clustering_algorithm})"
+            )
+        else:  # 3 fields
+            fig = px.scatter_3d(
+                clustered_data, 
+                x=visualization_fields[0], 
+                y=visualization_fields[1], 
+                z=visualization_fields[2],
+                color='Cluster',
+                color_discrete_sequence=color_scale,
+                hover_data=['Height (cm)', 'Weight (kg)', 'Chest (cm)', 'Waist (cm)', 'Hip (cm)'],
+                title=f"3D Cluster Visualization ({clustering_algorithm})"
+            )
+
+        st.plotly_chart(fig)
 
 # Tab 5: Size Recommendations
 with tab5:
